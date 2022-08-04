@@ -3,8 +3,8 @@ package xauth
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/myskull/common/httpServer/xparam"
-	"gitee.com/myskull/common/httpServer/xredis"
+	"github.com/myskull/common/httpServer/xparam"
+	"github.com/myskull/common/httpServer/xredis"
 )
 
 const (

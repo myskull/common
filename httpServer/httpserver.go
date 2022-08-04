@@ -3,10 +3,10 @@ package httpServer
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/myskull/common/httpServer/xauth"
-	"gitee.com/myskull/common/httpServer/xparam"
-	"gitee.com/myskull/common/httpServer/xresp"
-	"gitee.com/myskull/common/httpServer/xrouter"
+	"github.com/myskull/common/httpServer/xauth"
+	"github.com/myskull/common/httpServer/xparam"
+	"github.com/myskull/common/httpServer/xresp"
+	"github.com/myskull/common/httpServer/xrouter"
 	"net/http"
 )
 

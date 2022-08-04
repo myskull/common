@@ -2,7 +2,7 @@ package xparam
 
 import (
 	"fmt"
-	"gitee.com/myskull/common/xparse"
+	"github.com/myskull/common/xparse"
 	"strings"
 )
 

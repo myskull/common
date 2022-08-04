@@ -1,4 +1,4 @@
-module gitee.com/myskull/common
+module github.com/myskull/common
 
 go 1.13
 

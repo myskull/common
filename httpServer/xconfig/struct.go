@@ -1,7 +1,7 @@
 package xconfig
 
 import (
-	"gitee.com/myskull/common/xparse"
+	"github.com/myskull/common/xparse"
 	"sync"
 )
 

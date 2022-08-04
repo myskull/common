@@ -1,7 +1,7 @@
 package xpath
 
 import (
-	"gitee.com/myskull/common/xparse"
+	"github.com/myskull/common/xparse"
 	"strings"
 )
 

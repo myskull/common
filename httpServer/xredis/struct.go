@@ -2,8 +2,8 @@ package xredis
 
 import (
 	"fmt"
-	"gitee.com/myskull/common/httpServer/xconfig"
 	"github.com/go-redis/redis"
+	"github.com/myskull/common/httpServer/xconfig"
 )
 
 type Redis struct {

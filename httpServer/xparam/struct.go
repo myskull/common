@@ -3,8 +3,8 @@ package xparam
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/myskull/common/xdate"
-	"gitee.com/myskull/common/xparse"
+	"github.com/myskull/common/xdate"
+	"github.com/myskull/common/xparse"
 	"net/http"
 	"strings"
 	"time"
