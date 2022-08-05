@@ -1,7 +1,7 @@
 package xconfig
 
 import (
-	"fmt"
+	"github.com/myskull/common/httpServer/xLog"
 	"io/ioutil"
 	"regexp"
 	"strings"
@@ -10,7 +10,7 @@ import (
 func New(file string) {
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
-		fmt.Printf("加载配置文件失败:%v\n", err)
+		xLog.Error("加载配置文件失败:%v", err)
 		return
 	}
 	reg, _ := regexp.Compile(`(\n\r|\n|\r)`)

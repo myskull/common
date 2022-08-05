@@ -1,66 +1,239 @@
 package xjson
 
 import (
-	"encoding/json"
 	"fmt"
-	"reflect"
+	"github.com/myskull/common/xdate"
+	"github.com/myskull/common/xparse"
+	"strings"
+	"time"
 )
 
-type XJson struct {
-	jsonData []byte // json解析器
-	isList   bool
-	data     interface{}
-}
-type A []interface{}
+type A []M
 type M map[string]interface{}
 
-func New(data []byte) *XJson {
-	var xj = &XJson{
-		jsonData: data,
+// 读取字符串
+func (this M) Get(key string, _def ...string) string {
+	def := ""
+	if len(_def) > 0 {
+		def = _def[0]
 	}
-	err := xj.parse()
-	if err != nil {
-		return nil
+	val, ok := this[key]
+	if ok {
+		return fmt.Sprint(val)
+	} else {
+		return def
 	}
-	return xj
 }
 
-func (this *XJson) parse() error {
-	if string(this.jsonData[0:1]) == "[" {
-		fmt.Println(string(this.jsonData), "是列表")
-		this.isList = true
-		var list A
-		err := json.Unmarshal(this.jsonData, &list)
-		if err != nil {
-			fmt.Printf("非json结构!%+v", string(this.jsonData))
-			return err
-		}
-		var result = A{}
-		for _, row := range list {
-			_type := reflect.TypeOf(row)
-			// 重新解析一下
-			if _type.String() == "[]interface {}" {
-				// 表示还需要上襦解析
-				b, err := json.Marshal(row)
-				if err != nil {
-					return err
-				}
-				result = append(result, New(b))
-			} else if _type.String() == "map[string]interface {}" {
-				result = append(result, row)
-			} else {
-				result = append(result, row)
+// 整形
+func (this M) Int(key string, _def ...int) int {
+	def := int(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Int(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Int8(key string, _def ...int8) int8 {
+	def := int8(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Int8(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Int32(key string, _def ...int32) int32 {
+	def := int32(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Int32(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Int64(key string, _def ...int64) int64 {
+	def := int64(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Int64(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Uint(key string, _def ...uint) uint {
+	def := uint(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Uint(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Uint8(key string, _def ...uint8) uint8 {
+	def := uint8(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Uint8(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Uint32(key string, _def ...uint32) uint32 {
+	def := uint32(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Uint32(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Uint64(key string, _def ...uint64) uint64 {
+	def := uint64(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Uint64(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Bool(key string, _def ...bool) bool {
+	def := false
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Bool(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Float32(key string, _def ...float32) float32 {
+	def := float32(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Float32(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+// 整形
+func (this M) Float64(key string, _def ...float64) float64 {
+	def := float64(0)
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	val, ok := this[key]
+	if ok {
+		return xparse.Float64(fmt.Sprint(val))
+	} else {
+		return def
+	}
+}
+
+func (this M) Exists(key string) bool {
+	_, ok := this[key]
+	return ok
+}
+
+// 时间戳转换日期格式
+func (this M) Date(key string, _format ...string) string {
+	format := "2006-01-02 15:04:05"
+	if len(_format) > 0 {
+		format = _format[0]
+	}
+	timestamp := this.Int64(key)
+	return xdate.ToDate(timestamp, format)
+}
+
+// 日期格式转换时间戳
+func (this M) Timestamp(key string, _def ...int64) int64 {
+	def := time.Now().Unix()
+	if len(_def) > 0 {
+		def = _def[0]
+	}
+	if this.Exists(key) {
+		return xdate.ToTime(this.Get(key))
+	} else {
+		return def
+	}
+}
+
+// 数字列表
+func (this M) NumberList(key string, _sep ...string) []int32 {
+	sep := ","
+	if len(_sep) > 0 {
+		sep = _sep[0]
+	}
+	list := []int32{}
+	if !this.Exists(key) {
+		return list
+	} else {
+		numbers := this.Get(key)
+		if numbers != "" {
+			rows := strings.Split(numbers, sep)
+			for _, row := range rows {
+				list = append(list, xparse.Int32(row))
 			}
 		}
-		this.data = result
-		fmt.Println("列表数据", this.data)
-	} else {
-		fmt.Println(string(this.jsonData), "不是列表")
-		this.isList = false
+		return list
 	}
-	return nil
 }
 
-func (this *XJson) ForEach(_func func(key, value interface{})) {
-
+// 分割列表
+func (this M) Splits(key string, sep string) []string {
+	str := this.Get(key)
+	if str != "" {
+		return strings.Split(str, sep)
+	} else {
+		return []string{}
+	}
 }

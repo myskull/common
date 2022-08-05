@@ -2,7 +2,6 @@ package xparam
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/myskull/common/xdate"
 	"github.com/myskull/common/xparse"
 	"net/http"
@@ -23,10 +22,15 @@ func New(request *http.Request) *XParam {
 	param := &XParam{
 		request:   request,
 		data:      map[string]string{},
-		maxMemory: 32,
+		maxMemory: 10 * 1024 * 1024, // 默认最大10M
 	}
 	param.parse()
 	return param
+}
+
+func (this *XParam) SetMaxMemory(maxMemory int64) *XParam {
+	this.maxMemory = maxMemory
+	return this
 }
 
 // 解析请求数据
@@ -48,7 +52,7 @@ func (this *XParam) parse() {
 	}
 	if this.request.Method != "GET" && len(this.request.PostForm) == 0 {
 		// 啥都没有，估计要从body读取数据
-		this.request.ParseMultipartForm(1 << this.maxMemory)
+		this.request.ParseMultipartForm(this.maxMemory)
 		//fmt.Println("文件上传", this.request.Header.Get("Content-type"))
 		if this.request.MultipartForm != nil {
 			for key, val := range this.request.MultipartForm.Value {
@@ -312,7 +316,7 @@ func (this *XParam) XPath() XPath {
 // 读取ip信息
 func (this *XParam) IP() string {
 	//fmt.Println(this.request.Header) // 还未从header读取
-	fmt.Println(this.request.RemoteAddr)
+	//fmt.Println(this.request.RemoteAddr)
 	index := strings.LastIndex(this.request.RemoteAddr, ":")
 	return this.request.RemoteAddr[0:index]
 }

@@ -32,8 +32,8 @@ func GetStr(section, key string, _def ...string) string {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -45,8 +45,8 @@ func GetInt(section, key string, _def ...int) int {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -58,8 +58,8 @@ func GetInt8(section, key string, _def ...int8) int8 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -71,8 +71,8 @@ func GetInt32(section, key string, _def ...int32) int32 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -84,8 +84,8 @@ func GetInt64(section, key string, _def ...int64) int64 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -97,8 +97,8 @@ func GetUint(section, key string, _def ...uint) uint {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -110,8 +110,8 @@ func GetUint8(section, key string, _def ...uint8) uint8 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -123,8 +123,8 @@ func GetUint32(section, key string, _def ...uint32) uint32 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -136,8 +136,8 @@ func GetUint64(section, key string, _def ...uint64) uint64 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -149,8 +149,8 @@ func GetFloat32(section, key string, _def ...float32) float32 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -162,8 +162,8 @@ func GetFloat64(section, key string, _def ...float64) float64 {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
@@ -175,10 +175,28 @@ func GetBool(section, key string, _def ...bool) bool {
 	if len(_def) > 0 {
 		def = _def[0]
 	}
-	locker.Lock()
-	defer locker.Unlock()
+	locker.RLock()
+	defer locker.RUnlock()
 	if _, ok := config.data[section]; !ok {
 		return def
 	}
 	return xparse.Bool(config.data[section][key])
+}
+
+func SectionExists(section string) bool {
+	locker.RLock()
+	defer locker.RUnlock()
+	_, ok := config.data[section]
+	return ok
+}
+
+func KeyExists(section, key string) bool {
+	locker.RLock()
+	defer locker.RUnlock()
+	_, ok := config.data[section]
+	if !ok {
+		return false
+	}
+	_, ok = config.data[section][key]
+	return ok
 }

@@ -1,8 +1,8 @@
 package xredis
 
 import (
-	"fmt"
 	"github.com/go-redis/redis"
+	"github.com/myskull/common/httpServer/xLog"
 	"github.com/myskull/common/httpServer/xconfig"
 )
 
@@ -16,12 +16,7 @@ var redisConn = Redis{}
 // 持久化处理
 func New() error {
 	if redisConn.client != nil {
-		err := ping()
-		if err != nil {
-			fmt.Println("redis链接已失效:", err.Error())
-		} else {
-			return nil
-		}
+		return nil
 	}
 	address := xconfig.GetStr("redis", "address", "127.0.0.1:6379")
 	client := redis.NewClient(&redis.Options{
@@ -30,7 +25,7 @@ func New() error {
 	redisConn.client = client
 	err := ping()
 	if err != nil {
-		fmt.Println("redis链接出错:", err.Error())
+		xLog.Error("redis链接出错:%v", err.Error())
 	}
 	return err
 }

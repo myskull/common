@@ -71,8 +71,4 @@ func Location(url string) XResp {
 		IsLocation: true,
 		Url:        url,
 	}
-	//xResp.w.Header().Set("Cache-control", "must-revalidate,no-store")
-	//xResp.w.Header().Set("Content-Type", "text/html;charset=UTF-8")
-	//xResp.w.Header().Set("Location", url)
-	//xResp.w.WriteHeader(307)
 }

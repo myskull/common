@@ -10,12 +10,13 @@ import (
 )
 
 type XRouter struct {
-	Title    string                                                     // 路由的名字
-	Router   string                                                     // 路由
-	Callback func(xparam *xparam.XParam, auth *xauth.XAuth) xresp.XResp // 回调函数
-	Method   string
-	IsLogin  bool    // 是否验证登录
-	Params   []Param // 自动校验参数列表, 不校验也可以拿到其他的参数. 这里主要是为了校验其他数据格式
+	Title     string                                                     // 路由的名字
+	Router    string                                                     // 路由
+	Callback  func(xparam *xparam.XParam, auth *xauth.XAuth) xresp.XResp // 回调函数
+	Method    string
+	IsLogin   bool    // 是否验证登录
+	Params    []Param // 自动校验参数列表, 不校验也可以拿到其他的参数. 这里主要是为了校验其他数据格式
+	MaxMemory int64
 }
 
 var RouterPools = make(map[string]*XRouter) // 路由函数
