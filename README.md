@@ -1,7 +1,7 @@
-
-
 ```aidl
 路由注册
+```
+```aidl
 xrouter.Register(xrouter.XRouter{
     Router: "/request",
     Callback: func(xparam *xparam.XParam, auth *xauth.XAuth) xresp.XResp {
@@ -58,8 +58,59 @@ xrouter.Register(xrouter.XRouter{
     Method: "",
 })
 ```
-
+```aidl
+配置文件内容:
+```
+```aidl
+[redis]
+address=127.0.0.1:6379
+[mysql]
+database=数据库名字
+hostname=数据库地址:数据库端口
+username=数据库账号
+password=数据库密码
+[system]
+# 日志等级备注: 2INFO  4DEBUG  8WARNING  16:ERROR
+# INFO+DEBUG+WARNING+ERROR   表示全部输出
+# INFO+DEBUG 表示只输出INFO跟ERRPR
+# 0或则不填，表示默认
+logLevel=
+```
 ```aidl
 服务启动
-httpServer.Start(8000)
+httpServer.Start(8000,"配置文件路径")
+mysql操作:  xmysql.NewBuilder() 
+redis: xredis.Get()
+日志: xLog.Info
+配置文件读取: xconfig.Get()
+API返回: xresp.Success()
+读取请求数据: xparam.XParam
+用户登录检验: xauth.Check(param *xparam.XParam)
+用户信息读取: xauth.Get()
+用户信息保存: xauth.Set()
+用户信息删除: xauth.Del()
+重定义用户的存储:
+    xauth.Get = function(id int64)*xauth.XAuth{
+        return &xauth.XAuth{}
+    }
+    
+    xauth.Set = function(xauth.XAuth)error{
+        return nil
+    }
+    
+    xauth.Del = function(id int64){
+    }
+    xauth.Check = func(param *xparam.XParam)*xauth.XAuth{
+        return nil // nil表示登录失败
+    }
+```
+```aidl
+param xparam.XParam
+读取路由地址的参数: 
+    Router: /users/10/21
+    param.XPath().Int()     // 读取到 21  自动读取到最后一个参数
+    param.Varable(0).Get()  // 读取到 users
+    param.Varable(1).Int()  // 读取到 10
+    param.Varable(2).Int()  // 读取到 21
+    param.Varable(3).Int()  // 读取到 0  没有参数对应，返回Int的默认值0
 ```

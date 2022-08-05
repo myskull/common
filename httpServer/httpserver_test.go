@@ -97,5 +97,5 @@ func TestAA(test *testing.T) {
 		// 数据库， redis的操作
 		return xauth.Get(uid)
 	}
-	Start(8000)
+	Start(8000, "")
 }

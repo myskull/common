@@ -3,14 +3,25 @@ package httpServer
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/myskull/common/httpServer/xLog"
 	"github.com/myskull/common/httpServer/xauth"
+	"github.com/myskull/common/httpServer/xconfig"
 	"github.com/myskull/common/httpServer/xparam"
 	"github.com/myskull/common/httpServer/xresp"
 	"github.com/myskull/common/httpServer/xrouter"
 	"net/http"
 )
 
-func Start(port int) {
+func Start(port int, file string) {
+	if file != "" {
+		xconfig.New(file)
+	}
+	if xconfig.KeyExists("system", "logLevel") {
+		logLevel := xconfig.GetInt("system", "logLevel", xLog.LOG_ALL)
+		if logLevel > 0 {
+			xLog.SetLevel(logLevel)
+		}
+	}
 	http.HandleFunc("/", XHandler)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 }
@@ -26,6 +37,9 @@ func XHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	param := xparam.New(r)
+	if router.MaxMemory > 0 {
+		param.SetMaxMemory(router.MaxMemory) // 通过路由设定文件上传
+	}
 	if len(router.Params) > 0 {
 		// 需要自动校验参数
 		for _, p := range router.Params {
@@ -61,7 +75,7 @@ func output(w http.ResponseWriter, resp xresp.XResp) {
 	} else {
 		b, err := json.Marshal(resp)
 		if err != nil {
-			fmt.Println("json序列化失败:", err.Error())
+			xLog.Error("json序列化失败:", err.Error())
 			w.WriteHeader(502)
 		} else {
 			w.Write(b)
