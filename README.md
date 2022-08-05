@@ -1,5 +1,5 @@
 ```aidl
-路由注册
+路由注册 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
 ```
 ```aidl
 xrouter.Register(xrouter.XRouter{

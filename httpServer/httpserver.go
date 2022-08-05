@@ -22,11 +22,11 @@ func Start(port int, file string) {
 			xLog.SetLevel(logLevel)
 		}
 	}
-	http.HandleFunc("/", XHandler)
+	http.HandleFunc("/", xHandler)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 }
 
-func XHandler(w http.ResponseWriter, r *http.Request) {
+func xHandler(w http.ResponseWriter, r *http.Request) {
 	pathURL := r.URL.Path
 	if pathURL == "/favicon.ico" {
 		return
