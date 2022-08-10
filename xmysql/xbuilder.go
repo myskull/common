@@ -1,8 +1,9 @@
 package xmysql
 
 import (
+	"database/sql"
 	"fmt"
-	"github.com/myskull/common/httpServer/xjson"
+	"github.com/myskull/common/xjson"
 	"reflect"
 )
 
@@ -22,6 +23,8 @@ type XBuilder struct {
 	joinOn        string // join的条件
 	error         error
 	duplicateData string // on duplicate key update
+	db            *sql.DB
+	tx            *sql.Tx // 事务指针
 }
 
 func NewBuilder(table ...string) *XBuilder {
@@ -37,6 +40,8 @@ func NewBuilder(table ...string) *XBuilder {
 	if err != nil {
 		builder.error = err
 	}
+	builder.db = xMysql.db
+	builder.tx = nil
 	return builder
 }
 
@@ -135,12 +140,15 @@ func (this *XBuilder) RightJoin(table string, on string) *XBuilder {
 	return this
 }
 
-func (this *XBuilder) query(sql string) (xjson.A, error) {
-	this.sql = sql
-	if xMysql.db == nil {
-		return nil, fmt.Errorf("数据库链接已断开!")
+func (this *XBuilder) query(_sql string) (xjson.A, error) {
+	this.sql = _sql
+	var rows *sql.Rows
+	var err error
+	if this.tx != nil {
+		rows, err = this.tx.Query(this.sql)
+	} else {
+		rows, err = this.db.Query(this.sql)
 	}
-	rows, err := xMysql.db.Query(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +179,7 @@ func (this *XBuilder) query(sql string) (xjson.A, error) {
 		result = append(result, row)
 	}
 	if len(result) == 0 {
-		return nil, fmt.Errorf("not foud")
+		return nil, fmt.Errorf("not found")
 	}
 	return result, nil
 }
@@ -254,24 +262,29 @@ func (this *XBuilder) Save(data xjson.M) (int64, error) {
 	if this.error != nil {
 		return 0, this.error
 	}
-	sql := "UPDATE "
-	sql += fmt.Sprintf(" %v set ", this.table)
+	_sql := fmt.Sprintf("UPDATE %v set ", this.table)
 	i := 0
 	for key, val := range data {
 		if i > 0 {
-			sql += ","
+			_sql += ","
 		}
-		sql += fmt.Sprintf(" `%v` = '%v' ", key, val)
+		_sql += fmt.Sprintf(" `%v` = '%v' ", key, val)
 		i++
 	}
 	if this.where != "" {
-		sql += fmt.Sprintf(" where %v ", this.where)
+		_sql += fmt.Sprintf(" where %v ", this.where)
 	}
 	if this.limit_m > 0 || this.limit_n > 0 {
-		sql += fmt.Sprintf(" limit %v,%v ", this.limit_n, this.limit_m)
+		_sql += fmt.Sprintf(" limit %v,%v ", this.limit_n, this.limit_m)
 	}
-	this.sql = sql
-	result, err := xMysql.db.Exec(this.sql)
+	this.sql = _sql
+	var result sql.Result
+	var err error
+	if this.tx != nil {
+		result, err = this.tx.Exec(this.sql)
+	} else {
+		result, err = this.db.Exec(this.sql)
+	}
 	if err != nil {
 		return 0, err
 	}
@@ -282,22 +295,27 @@ func (this *XBuilder) Del(id ...uint32) (int64, error) {
 	if this.error != nil {
 		return 0, this.error
 	}
-	sql := fmt.Sprintf(" DELETE FROM %v ", this.table)
-	sql += " where 1 = 1 "
+	this.sql = fmt.Sprintf(" DELETE FROM %v ", this.table)
+	this.sql += " where 1 = 1 "
 	if this.where != "" {
-		sql += fmt.Sprintf(" and %v ", this.where)
+		this.sql += fmt.Sprintf(" and %v ", this.where)
 	}
 	if len(id) > 0 {
-		sql += fmt.Sprintf(" and id = %v ", id[0])
+		this.sql += fmt.Sprintf(" and id = %v ", id[0])
 	}
 	if this.order != "" {
-		sql += fmt.Sprintf(" order by %v ", this.order)
+		this.sql += fmt.Sprintf(" order by %v ", this.order)
 	}
 	if this.limit_m > 0 || this.limit_n > 0 {
-		sql += fmt.Sprintf(" limit %v,%v ", this.limit_n, this.limit_m)
+		this.sql += fmt.Sprintf(" limit %v,%v ", this.limit_n, this.limit_m)
 	}
-	this.sql = sql
-	result, err := xMysql.db.Exec(this.sql)
+	var result sql.Result
+	var err error
+	if this.tx != nil {
+		result, err = this.tx.Exec(this.sql)
+	} else {
+		result, err = this.db.Exec(this.sql)
+	}
 	if err != nil {
 		return 0, err
 	}
@@ -308,8 +326,8 @@ func (this *XBuilder) Add(data xjson.M) (int64, error) {
 	if this.error != nil {
 		return 0, this.error
 	}
-	sql := "insert into  "
-	sql += fmt.Sprintf(" %v ", this.table)
+	this.sql = "insert into  "
+	this.sql += fmt.Sprintf(" %v ", this.table)
 	field := ""
 	column := ""
 	for key, val := range data {
@@ -322,12 +340,17 @@ func (this *XBuilder) Add(data xjson.M) (int64, error) {
 		column += fmt.Sprintf(" `%v`", key)
 		field += fmt.Sprintf("  '%v' ", val)
 	}
-	sql += fmt.Sprintf(" (%v)value(%v)", column, field)
+	this.sql += fmt.Sprintf(" (%v)value(%v)", column, field)
 	if this.duplicateData != "" {
-		sql += fmt.Sprintf(" on duplicate key update %v ", this.duplicateData)
+		this.sql += fmt.Sprintf(" on duplicate key update %v ", this.duplicateData)
 	}
-	this.sql = sql
-	result, err := xMysql.db.Exec(this.sql)
+	var result sql.Result
+	var err error
+	if this.tx != nil {
+		result, err = this.tx.Exec(this.sql)
+	} else {
+		result, err = this.db.Exec(this.sql)
+	}
 	if err != nil {
 		return 0, err
 	}
@@ -347,8 +370,8 @@ func (this *XBuilder) ReplaceInfo(data xjson.M) (int64, error) {
 	if this.error != nil {
 		return 0, this.error
 	}
-	sql := "replace into  "
-	sql += fmt.Sprintf(" %v ", this.table)
+	this.sql = "replace into  "
+	this.sql += fmt.Sprintf(" %v ", this.table)
 	field := ""
 	column := ""
 	for key, val := range data {
@@ -361,11 +384,40 @@ func (this *XBuilder) ReplaceInfo(data xjson.M) (int64, error) {
 		column += fmt.Sprintf(" `%v`", key)
 		field += fmt.Sprintf("  '%v' ", val)
 	}
-	sql += fmt.Sprintf(" (%v)value(%v)", column, field)
-	this.sql = sql
-	result, err := xMysql.db.Exec(this.sql)
+	this.sql += fmt.Sprintf(" (%v)value(%v)", column, field)
+	var result sql.Result
+	var err error
+	if this.tx != nil {
+		result, err = this.tx.Exec(this.sql)
+	} else {
+		result, err = this.db.Exec(this.sql)
+	}
 	if err != nil {
 		return 0, err
 	}
 	return result.LastInsertId()
+}
+
+// 事务启动
+func (this *XBuilder) StartTrans() error {
+	tx, err := this.db.Begin()
+	this.tx = tx
+	return err
+}
+
+func (this *XBuilder) Commit() error {
+	return this.tx.Commit()
+}
+
+func (this *XBuilder) Rollback() error {
+	return this.tx.Rollback()
+}
+
+func (this *XBuilder) Exce(_sql string, format ...interface{}) (sql.Result, error) {
+	this.sql = fmt.Sprintf(_sql, format...)
+	if this.tx != nil {
+		return this.tx.Exec(this.sql)
+	} else {
+		return this.db.Exec(this.sql)
+	}
 }

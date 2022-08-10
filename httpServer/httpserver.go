@@ -3,12 +3,12 @@ package httpServer
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/myskull/common/httpServer/xLog"
 	"github.com/myskull/common/httpServer/xauth"
-	"github.com/myskull/common/httpServer/xconfig"
 	"github.com/myskull/common/httpServer/xparam"
 	"github.com/myskull/common/httpServer/xresp"
 	"github.com/myskull/common/httpServer/xrouter"
+	"github.com/myskull/common/xLog"
+	"github.com/myskull/common/xconfig"
 	"net/http"
 )
 
@@ -44,10 +44,12 @@ func xHandler(w http.ResponseWriter, r *http.Request) {
 		// 需要自动校验参数
 		for _, p := range router.Params {
 			val := param.Get(p.Key, p.Default)
-			if val != p.Default && !p.Check(val) {
+			if val != p.Default || p.Require {
 				// 默认值不需要校验
-				output(w, xresp.NoLogin())
-				return
+				if !p.Check(val) {
+					output(w, xresp.ParamError())
+					return
+				}
 			}
 		}
 	}

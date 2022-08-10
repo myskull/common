@@ -2,7 +2,9 @@ package xLog
 
 import (
 	"fmt"
+	"github.com/myskull/common/xdate"
 	"runtime"
+	"time"
 )
 
 const (
@@ -34,7 +36,8 @@ func Info(log string, format ...interface{}) {
 		return
 	}
 	text := fmt.Sprintf(log, format...)
-	text = fmt.Sprintf("%v:INFO %v", getFileLine(), text)
+
+	text = fmt.Sprintf("%v:INFO:%v %v", getFileLine(), xdate.ToDate(time.Now().Unix()), text)
 	fmt.Println(fmt.Sprintf("\x1b[0;%dm%s\x1b[0m", textColorCyan, text))
 }
 
@@ -43,7 +46,7 @@ func Warning(log string, format ...interface{}) {
 		return
 	}
 	text := fmt.Sprintf(log, format...)
-	text = fmt.Sprintf("%v:WARNING %v", getFileLine(), text)
+	text = fmt.Sprintf("%v:WARNING:%v %v", getFileLine(), xdate.ToDate(time.Now().Unix()), text)
 	fmt.Println(fmt.Sprintf("\x1b[0;%dm%s\x1b[0m", textColorYellow, text))
 }
 
@@ -52,7 +55,7 @@ func Debug(log string, format ...interface{}) {
 		return
 	}
 	text := fmt.Sprintf(log, format...)
-	text = fmt.Sprintf("%v:DEBUG %v", getFileLine(), text)
+	text = fmt.Sprintf("%v:DEBUG:%v %v", getFileLine(), xdate.ToDate(time.Now().Unix()), text)
 	fmt.Println(fmt.Sprintf("\x1b[0;%dm%s\x1b[0m", textColorGreen, text))
 }
 
@@ -61,10 +64,16 @@ func Error(log string, format ...interface{}) {
 		return
 	}
 	text := fmt.Sprintf(log, format...)
-	text = fmt.Sprintf("%v:ERROR %v", getFileLine(), text)
+	text = fmt.Sprintf("%v:ERROR:%v %v", getFileLine(), xdate.ToDate(time.Now().Unix()), text)
 	fmt.Println(fmt.Sprintf("\x1b[0;%dm%s\x1b[0m", textColorRed, text))
 }
 func getFileLine() string {
-	_, file, line, _ := runtime.Caller(1)
+	//fmt.Println(runtime.Caller(0))
+	//fmt.Println(runtime.Caller(1))
+	//fmt.Println(runtime.Caller(2))
+	_, file, line, _ := runtime.Caller(2)
+	//if strings.HasSuffix("") {
+	//
+	//}
 	return fmt.Sprintf("%v:%v", file, line)
 }

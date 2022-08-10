@@ -29,6 +29,13 @@ func ServerError() XResp {
 	}
 }
 
+func ParamError() XResp {
+	return XResp{
+		Code:    50002,
+		Message: "参数不合法!",
+	}
+}
+
 func NoLogin() XResp {
 	return XResp{
 		Code:    40000,

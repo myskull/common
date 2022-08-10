@@ -1,7 +1,7 @@
 package xmysql
 
 import (
-	"github.com/myskull/common/httpServer/xjson"
+	"github.com/myskull/common/xjson"
 	"reflect"
 )
 

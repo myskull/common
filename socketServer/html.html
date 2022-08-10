@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    var ws = new WebSocket("ws://127.0.0.1:8001/websocket?a=xx")
+    if(ws){
+        ws.onopen = function (ev) {
+            console.log(ev)
+        }
+        ws.onmessage = function (ev){
+            console.log(ev)
+        }
+        ws.onerror = function (ev) {
+            console.log(ev)
+        }
+        ws.onclose = function (ev){
+            console.log(ev)
+        }
+    }
+</script>
+</body>
+</html>
