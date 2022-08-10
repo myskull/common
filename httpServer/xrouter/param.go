@@ -9,6 +9,7 @@ type Param struct {
 	Comment string // 参数备注  生成API用到
 	Type    int    // 参数类型
 	Default string // 默认值
+	Require bool   // 是否是必填
 	Func    func(value string) bool
 }
 

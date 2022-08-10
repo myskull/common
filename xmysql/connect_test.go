@@ -2,8 +2,8 @@ package xmysql
 
 import (
 	"fmt"
-	"github.com/myskull/common/httpServer/xconfig"
-	"github.com/myskull/common/httpServer/xjson"
+	"github.com/myskull/common/xconfig"
+	"github.com/myskull/common/xjson"
 	"testing"
 )
 

@@ -1,7 +1,7 @@
 package xconfig
 
 import (
-	"github.com/myskull/common/httpServer/xLog"
+	"github.com/myskull/common/xLog"
 	"io/ioutil"
 	"regexp"
 	"strings"
